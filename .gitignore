@@ -1,0 +1,16 @@
+__pycache__
+# Ignore everything in storage directory
+storage/*
+
+# But keep these directories
+!storage/input/
+!storage/output/
+
+# Ignore everything in those directories
+storage/input/*
+storage/output/*
+
+# Except .gitkeep files to maintain directory structure
+!storage/input/.gitkeep
+!storage/output/.gitkeep
+venv
