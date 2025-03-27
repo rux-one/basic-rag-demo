@@ -6,6 +6,7 @@ import logging
 # Import our custom modules
 from documents_watcher import get_new_files_delta
 from document_converter import convert_document_to_markdown
+from document_feeder import feed_document_to_qdrant
 
 # Configure logging
 logging.basicConfig(
@@ -43,6 +44,16 @@ class DocumentProcessingWorker:
             self.thread.join()
         logger.info("Document Processing Worker stopped")
     
+    def _on_document_converted(self, output_path):
+        logger.info("Document conversion complete. Output path: %s", output_path)
+        # Add the document to Qdrant
+        collection_name = "documents"
+        success = feed_document_to_qdrant(output_path, collection_name)
+        if success:
+            logger.info("Successfully added document to Qdrant collection '%s'", collection_name)
+        else:
+            logger.error("Failed to add document to Qdrant collection '%s'", collection_name)
+    
     def _run(self):
         while self.running:
             try:
@@ -64,8 +75,12 @@ class DocumentProcessingWorker:
                             logger.info("Input path: %s", input_path)
                             logger.info("Output path: %s", output_path)
                             
-                            # Convert the document
-                            success = convert_document_to_markdown(input_path, output_path)
+                            # Convert the document with callback
+                            success = convert_document_to_markdown(
+                                input_path, 
+                                output_path,
+                                on_complete=self._on_document_converted
+                            )
                             
                             if success:
                                 logger.info("Successfully converted %s to Markdown", filename)
