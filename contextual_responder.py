@@ -1,10 +1,11 @@
 import os
 import re
 import logging
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Literal
 
 from chunk_finder import ChunkFinder
 from chat_service import ChatService
+from openai_chat_service import OpenAIChatService
 
 # Configure logging
 logging.basicConfig(
@@ -18,24 +19,42 @@ class ContextualResponder:
                  model_name: str = "llama3:8b",
                  collection_name: str = "documents",
                  keyword_prompt_path: str = "./prompts/keyword_extractor.md",
-                 context_prompt_path: str = "./prompts/context_based_query.md"):
+                 context_prompt_path: str = "./prompts/context_based_query.md",
+                 service_type: Literal["ollama", "openai"] = "ollama"):
         """
         Initialize the ContextualResponder.
         
         Args:
-            model_name (str): Name of the model to use. Defaults to "llama3:8b".
+            model_name (str): Name of the model to use. Defaults to "llama3:8b" for Ollama or "gpt-3.5-turbo" for OpenAI.
             collection_name (str): Name of the Qdrant collection to search in. Defaults to "documents".
             keyword_prompt_path (str): Path to the keyword extraction prompt. Defaults to "./prompts/keyword_extractor.md".
             context_prompt_path (str): Path to the context-based query prompt. Defaults to "./prompts/context_based_query.md".
+            service_type (str): Type of chat service to use ("ollama" or "openai"). Defaults to "ollama".
         """
         self.model_name = model_name
         self.collection_name = collection_name
         self.keyword_prompt_path = keyword_prompt_path
         self.context_prompt_path = context_prompt_path
+        self.service_type = service_type
         
         # Initialize components
         self.chunk_finder = ChunkFinder(collection_name=collection_name)
-        self.chat_service = ChatService()
+        
+        # Initialize the appropriate chat service
+        if service_type == "openai":
+            # Check if OpenAI API key is set
+            if not os.getenv("OPENAI_API_KEY"):
+                logger.warning("OPENAI_API_KEY environment variable is not set. OpenAI service may not work properly.")
+            
+            # Use default OpenAI model if none specified
+            if model_name == "llama3:8b":  # If still using the Ollama default
+                self.model_name = "gpt-3.5-turbo"
+                
+            self.chat_service = OpenAIChatService()
+            logger.info(f"Using OpenAI chat service with model: {self.model_name}")
+        else:  # ollama
+            self.chat_service = ChatService()
+            logger.info(f"Using Ollama chat service with model: {self.model_name}")
         
         # Load the prompts
         self._load_keyword_prompt()
@@ -227,10 +246,16 @@ if __name__ == "__main__":
     parser.add_argument('--collection', type=str, default="documents", help='Qdrant collection name')
     parser.add_argument('--num-chunks', type=int, default=3, help='Number of document chunks to retrieve')
     parser.add_argument('--display-context', action='store_true', help='Display the full prompt with context')
+    parser.add_argument('--service', type=str, choices=['ollama', 'openai'], default='ollama', help='Chat service to use')
+    parser.add_argument('--model', type=str, help='Model to use (defaults depend on service)')
     args = parser.parse_args()
     
-    # Create contextual responder
-    responder = ContextualResponder(collection_name=args.collection)
+    # Create contextual responder with the specified service
+    responder = ContextualResponder(
+        model_name=args.model if args.model else ("llama3:8b" if args.service == "ollama" else "gpt-3.5-turbo"),
+        collection_name=args.collection,
+        service_type=args.service
+    )
     
     # Get a response to the query
     result = responder.get_response(args.query, num_chunks=args.num_chunks, display_context=args.display_context)
@@ -246,4 +271,3 @@ if __name__ == "__main__":
         # If display_context is False, result should be just the response
         print(f"\nQuery: {args.query}")
         print(f"\nResponse:\n{result}")
-        

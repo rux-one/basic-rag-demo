@@ -1,7 +1,12 @@
 import requests
 import logging
 import json
+import os
 from typing import Optional, Iterator, Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -11,15 +16,16 @@ logging.basicConfig(
 logger = logging.getLogger('ChatService')
 
 class ChatService:
-    def __init__(self, base_url: str = "http://localhost:11434"):
+    def __init__(self, base_url: Optional[str] = None):
         """
         Initialize the ChatService with the Ollama API URL.
         
         Args:
-            base_url (str): Base URL for the Ollama API. Defaults to "http://localhost:11434".
+            base_url (Optional[str]): Base URL for the Ollama API. If None, it will be loaded from environment variables.
         """
-        self.base_url = base_url
-        self.api_url = f"{base_url}/api/chat"
+        # Use provided base URL or load from environment
+        self.base_url = base_url or os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+        self.api_url = f"{self.base_url}/api/chat"
         logger.info(f"ChatService initialized with API URL: {self.api_url}")
     
     def chat(self, 
@@ -121,23 +127,39 @@ class ChatService:
 
 # Example usage
 if __name__ == "__main__":
-    # Create a chat service instance
+    import argparse
+    
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Send a chat request to Ollama')
+    parser.add_argument('--prompt', type=str, required=True, help='User prompt to send')
+    parser.add_argument('--model', type=str, default="llama3:8b", help='Ollama model to use')
+    parser.add_argument('--system', type=str, help='Optional system message')
+    parser.add_argument('--temperature', type=float, default=0.7, help='Temperature for response generation')
+    parser.add_argument('--stream', action='store_true', help='Stream the response')
+    args = parser.parse_args()
+    
+    # Create chat service instance
     chat_service = ChatService()
     
-    # Example with streaming
-    print("\nStreaming response:\n")
-    for chunk in chat_service.chat(
-        model="llama3:8b",
-        user_prompt="What is the meaning of life?",
-        system_message="You are a helpful AI assistant that provides the most accurate response."
-    ):
-        print(chunk, end='', flush=True)
-    
-    print("\n\nSynchronous response:\n")
-    # Example with synchronous response
-    response = chat_service.chat_sync(
-        model="llama3:8b",
-        user_prompt="What is the meaning of life?",
-        system_message="You are a helpful AI assistant that provides the most accurate response."
-    )
-    print(response)
+    if args.stream:
+        # Example with streaming
+        print("\nStreaming response:\n")
+        for chunk in chat_service.chat(
+            model=args.model,
+            user_prompt=args.prompt,
+            system_message=args.system,
+            temperature=args.temperature,
+            stream=True
+        ):
+            print(chunk, end='', flush=True)
+        print("\n")
+    else:
+        # Example with synchronous response
+        print("\nSynchronous response:\n")
+        response = chat_service.chat_sync(
+            model=args.model,
+            user_prompt=args.prompt,
+            system_message=args.system,
+            temperature=args.temperature
+        )
+        print(response)
