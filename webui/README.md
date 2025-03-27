@@ -24,10 +24,19 @@ python api.py
 - Real-time interaction with the contextual responder
 - Support for markdown-like formatting in messages (code blocks, links)
 - Typing indicators while waiting for responses
+- Configurable settings for the ContextualResponder:
+  - Model name (e.g., "llama3:8b", "gpt-3.5-turbo")
+  - Collection name for document retrieval
+  - Keyword and context prompt paths
+  - Service type (Ollama or OpenAI)
+  - Number of chunks to retrieve
+  - Option to display context used for responses
 
 ## How It Works
 
 The web UI sends user queries to the Flask API, which then uses the `ContextualResponder` class to generate contextual responses based on the documents in the system. The responses are then displayed in the chat interface.
+
+You can customize the behavior of the responder by clicking the settings icon in the top-right corner of the chat interface. This allows you to change the model, service type, and other parameters without modifying the code.
 
 ## Files
 

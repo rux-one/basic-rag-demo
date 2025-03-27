@@ -10,6 +10,12 @@
     <div class="chat-container">
         <div class="chat-header">
             <h1>RAG Chat Demo</h1>
+            <button id="settings-button" class="settings-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
         </div>
         <div class="chat-messages" id="chat-messages">
             <div class="message system">
@@ -28,6 +34,55 @@
             </button>
         </div>
     </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="model-name">Model Name:</label>
+                        <input type="text" id="model-name" value="llama3:8b" placeholder="e.g., llama3:8b, gpt-3.5-turbo">
+                    </div>
+                    <div class="form-group">
+                        <label for="collection-name">Collection Name:</label>
+                        <input type="text" id="collection-name" value="documents" placeholder="e.g., documents">
+                    </div>
+                    <div class="form-group">
+                        <label for="keyword-prompt-path">Keyword Prompt Path:</label>
+                        <input type="text" id="keyword-prompt-path" value="./prompts/keyword_extractor.md" placeholder="e.g., ./prompts/keyword_extractor.md">
+                    </div>
+                    <div class="form-group">
+                        <label for="context-prompt-path">Context Prompt Path:</label>
+                        <input type="text" id="context-prompt-path" value="./prompts/context_based_query.md" placeholder="e.g., ./prompts/context_based_query.md">
+                    </div>
+                    <div class="form-group">
+                        <label for="service-type">Service Type:</label>
+                        <select id="service-type">
+                            <option value="ollama" selected>Ollama</option>
+                            <option value="openai">OpenAI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="num-chunks">Number of Chunks:</label>
+                        <input type="number" id="num-chunks" value="10" min="1" max="50">
+                    </div>
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="display-context">
+                        <label for="display-context">Display Context</label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="save-settings">Initialize</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
