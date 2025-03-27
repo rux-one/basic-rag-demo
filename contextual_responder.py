@@ -88,7 +88,7 @@ class ContextualResponder:
             # Fallback to a simple prompt if the file can't be loaded
             self.context_prompt_template = """Answer the following question based on the provided context:\n\nContext: {{CONTEXT}}\n\nQuestion: {{USER_QUERY}}\n\nAnswer:"""
     
-    def get_response(self, query: str, num_chunks: int = 3, display_context: bool = False) -> Union[str, Tuple[str, str]]:
+    def get_response(self, query: str, num_chunks: int = 10, display_context: bool = False) -> Union[str, Tuple[str, str]]:
         """
         Get a contextual response to the user query.
         
@@ -244,7 +244,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get a contextual response to a query')
     parser.add_argument('--query', type=str, required=True, help='Query to get a response for')
     parser.add_argument('--collection', type=str, default="documents", help='Qdrant collection name')
-    parser.add_argument('--num-chunks', type=int, default=3, help='Number of document chunks to retrieve')
+    parser.add_argument('--num-chunks', type=int, default=10, help='Number of document chunks to retrieve')
     parser.add_argument('--display-context', action='store_true', help='Display the full prompt with context')
     parser.add_argument('--service', type=str, choices=['ollama', 'openai'], default='ollama', help='Chat service to use')
     parser.add_argument('--model', type=str, help='Model to use (defaults depend on service)')
