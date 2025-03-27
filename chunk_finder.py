@@ -1,9 +1,14 @@
 import logging
+import warnings
 from typing import List, Optional
 
+# Suppress deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
 from langchain.schema import Document
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import Qdrant
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Qdrant
 
 # Configure logging
 logging.basicConfig(
