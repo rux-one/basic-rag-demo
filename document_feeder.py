@@ -45,7 +45,7 @@ def feed_document_to_qdrant(markdown_file_path, collection_name, chunk_size=200,
         # Split the document into chunks
         text_splitter = CharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         chunks = text_splitter.split_documents(documents)
-        logger.info(f"Split document into {len(chunks)} chunks")
+        logger.info(f"✂️ Split document into {len(chunks)} chunks")
         
         # Create Qdrant vector store and add the chunks
         # Note: We're not using force_recreate=True to preserve existing documents
@@ -57,7 +57,7 @@ def feed_document_to_qdrant(markdown_file_path, collection_name, chunk_size=200,
             force_recreate=False
         )
         
-        logger.info(f"Successfully added document to Qdrant collection '{collection_name}'")
+        logger.info(f"💾 Successfully added document to Qdrant collection '{collection_name}'")
         return True
         
     except Exception as e:

@@ -50,7 +50,7 @@ class DocumentProcessingWorker:
         collection_name = "documents"
         success = feed_document_to_qdrant(output_path, collection_name)
         if success:
-            logger.info("Successfully added document to Qdrant collection '%s'", collection_name)
+            logger.info("✅ Successfully added document to Qdrant collection '%s'", collection_name)
         else:
             logger.error("Failed to add document to Qdrant collection '%s'", collection_name)
     
@@ -61,7 +61,7 @@ class DocumentProcessingWorker:
                 new_files = get_new_files_delta()
                 
                 if new_files:
-                    logger.info("Found %d new documents to process", len(new_files))
+                    logger.info("🔍 Found %d new documents to process", len(new_files))
                     
                     for filename in new_files:
                         # Check if it's a PDF file (we can add more file types later if needed)
@@ -71,9 +71,9 @@ class DocumentProcessingWorker:
                             output_filename = os.path.splitext(filename)[0] + '.md'
                             output_path = os.path.join('./storage/output', output_filename)
                             
-                            logger.info("Processing document: %s", filename)
-                            logger.info("Input path: %s", input_path)
-                            logger.info("Output path: %s", output_path)
+                            logger.info("⌛ Processing document: %s", filename)
+                            logger.info("➡️ Input path: %s", input_path)
+                            logger.info("⬅️ Output path: %s", output_path)
                             
                             # Convert the document with callback
                             success = convert_document_to_markdown(
@@ -83,7 +83,7 @@ class DocumentProcessingWorker:
                             )
                             
                             if success:
-                                logger.info("Successfully converted %s to Markdown", filename)
+                                logger.info("📄 Successfully converted %s to Markdown", filename)
                             else:
                                 logger.error("Failed to convert %s to Markdown", filename)
                         else:
